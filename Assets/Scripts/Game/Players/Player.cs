@@ -30,6 +30,7 @@ public class Player
         foreach (var unit in units)
         {
             unit.isCanMoveInTurn = true;
+            unit.isCanAttackInTurn = true;
         }
     }
 

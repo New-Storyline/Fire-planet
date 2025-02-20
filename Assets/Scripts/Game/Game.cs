@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Game
 {
-
     private Map<TerrainType> terrainMap;
     private Map<Building> buildingsMap;
     private Map<Unit> unitsMap;
@@ -91,7 +90,7 @@ public class Game
             throw new Exception($"Cannot move a unit to a non-adjacent tile! From: {unitPos.ToString()}. To: {newPos.ToString()}");
 
         unitsMap.Move(unitPos, newPos);
-        unit.OnMove();
+        unit.OnMove(GetUnitPossibleAttackPoints(newPos).Count != 0);
     }
 
     public void NextTurn()
@@ -115,22 +114,24 @@ public class Game
     {
         return unitsMap;
     }
-    internal List<Vector2Int> GetUnitPossibleMovePoints(Vector2Int pos)
+    internal List<Vector2Int> GetUnitPossibleMovePoints(Vector2Int unitPos)
     {
         if (
-            !IsUnitActive(pos) || 
-            PC.GetCurrentPlayer() != unitsMap.Get(pos).Owner
+            !IsUnitCanMove(unitPos) || 
+            PC.GetCurrentPlayer() != unitsMap.Get(unitPos).Owner
         )
             return null;
 
+        int moveRange = unitsMap.Get(unitPos).GetMoveRange();
+
         List <Vector2Int> possibleMoves = new List<Vector2Int>();
-        for (int x = -1;x <= 1;x++)
-            for(int y = -1;y <= 1; y++)
+        for (int x = -moveRange; x <= moveRange;x++)
+            for(int y = -moveRange; y <= moveRange; y++)
             {
                 if (x == 0 && y == 0)
                     continue;
 
-                Vector2Int newPos = pos + new Vector2Int(x, y);
+                Vector2Int newPos = unitPos + new Vector2Int(x, y);
 
                 if (!isPosValid(newPos))
                     continue;
@@ -140,7 +141,43 @@ public class Game
 
                 possibleMoves.Add(newPos);
             }
+       
         return possibleMoves;
+    }
+
+    public List<Vector2Int> GetUnitPossibleAttackPoints(Vector2Int unitPos)
+    {
+        Unit unit = unitsMap.Get(unitPos);
+
+        if (
+            !IsUnitCanAttack(unitPos) ||
+            PC.GetCurrentPlayer() != unit.Owner
+        )
+            return null;
+
+        int attackRange = unit.GetAttackRange();
+
+        List<Vector2Int> possibleAttackMoves = new List<Vector2Int>();
+        for (int x = -attackRange; x <= attackRange; x++)
+            for (int y = -attackRange; y <= attackRange; y++)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+
+                Vector2Int newPos = unitPos + new Vector2Int(x, y);
+
+                if (!isPosValid(newPos))
+                    continue;
+
+                Unit currUnit = unitsMap.Get(newPos);
+
+                if (currUnit == null || currUnit.Owner.Team == unit.Owner.Team)
+                    continue;
+
+                possibleAttackMoves.Add(newPos);
+            }
+
+        return possibleAttackMoves;
     }
 
     internal Unit GetUnit(Vector2Int pos)
@@ -175,7 +212,12 @@ public class Game
         return MathUtils.IsPosInRange(pos,Vector2Int.zero, terrainMap.GetSize() - new Vector2Int(1,1));
     }
 
-    public bool IsUnitActive(Vector2Int pos)
+    public bool IsUnitCanAttack(Vector2Int pos)
+    {
+        return unitsMap.Get(pos).isCanAttackInTurn;
+    }
+
+    public bool IsUnitCanMove(Vector2Int pos)
     {
         return unitsMap.Get(pos).isCanMoveInTurn;
     }

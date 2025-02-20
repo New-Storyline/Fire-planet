@@ -35,7 +35,10 @@ public class Render : MonoBehaviour
 
     private Map map;
 
-    private List<GameObject> unitMovePoints = new List<GameObject>();
+    /// <summary>
+    /// List of all unit move and attack points
+    /// </summary>
+    private List<GameObject> unitSpecPoints = new List<GameObject>();
 
     public void InitWorld(Map<Game.TerrainType> terrainMap, Map<Building>  buildings, Map<Unit> units)
     {
@@ -138,7 +141,9 @@ public class Render : MonoBehaviour
             map.unitsMap.Set(pos, unitObj);
         }
 
-        unitObj.GetComponent<UnitObject>().SetMaterial(playerColorMaterials[(int)unit.Owner.Team]);
+        UnitObject unitObject = unitObj.GetComponent<UnitObject>();
+        unitObject.SetMaterial(playerColorMaterials[(int)unit.Owner.Team]);
+        unitObject.SetHP(unit.HP, unit.GetMaxHP());
     }
 
     public Vector3 LocalPosToGlobal(Vector2Int pos) {
@@ -185,16 +190,16 @@ public class Render : MonoBehaviour
 
     public void ClearSelection()
     {
-        ClearUnitMovePos();
+        ClearUnitSpecPoints();
         selectUnitSprite.SetActive(false);
         selectTileSprite.SetActive(false);
     }
 
-    private void ClearUnitMovePos()
+    public void ClearUnitSpecPoints()
     {
-        foreach (GameObject movePoint in unitMovePoints)
+        foreach (GameObject point in unitSpecPoints)
         {
-            Destroy(movePoint);
+            Destroy(point);
         }
     }
 
@@ -216,7 +221,6 @@ public class Render : MonoBehaviour
 
     public void CreateUnitMovePoints(List<Vector2Int> movePoints)
     {
-        ClearUnitMovePos();
 
         if (movePoints == null)
             return;
@@ -230,7 +234,26 @@ public class Render : MonoBehaviour
                     getSpriteYoffset(movePoint) + 0.505f, 
                     movePoint.y * mapScale.y + TILES_OFFSET.z), 
                 Quaternion.identity);
-            unitMovePoints.Add(movePointObj);
+            unitSpecPoints.Add(movePointObj);
+        }
+    }
+
+    internal void CreateUnitAttackPoints(List<Vector2Int> attackPoints)
+    {
+        if (attackPoints == null)
+            return;
+
+        foreach (Vector2Int attackPoint in attackPoints)
+        {
+            GameObject attackPointObj = Instantiate(
+                selectUnitSprite,
+                new Vector3(
+                    attackPoint.x * mapScale.x + TILES_OFFSET.x,
+                    getSpriteYoffset(attackPoint) + 0.505f,
+                    attackPoint.y * mapScale.y + TILES_OFFSET.z),
+                Quaternion.identity);
+            attackPointObj.GetComponentInChildren<SpriteRenderer>().color = Color.red;
+            unitSpecPoints.Add(attackPointObj);
         }
     }
 

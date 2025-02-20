@@ -6,4 +6,8 @@ public class Rifleman : Unit
     {
 
     }
+
+    public override int GetMoveRange() { return 1; }
+    public override int GetAttackRange() { return 1; }
+    public override float GetMaxHP(){ return 10;}
 }

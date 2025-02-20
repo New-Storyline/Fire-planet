@@ -39,16 +39,21 @@ public class GameController : MonoBehaviour
     {
         if (pos != SelTool.selectedTilePosition)
         {
-            if(SelTool.selectionType == SelectionTool.SelectionType.Unit && game.IsUnitActive(SelTool.selectedTilePosition)) {
+            if(SelTool.selectionType == SelectionTool.SelectionType.Unit && game.IsUnitCanMove(SelTool.selectedTilePosition)) {
 
                 List<Vector2Int> movePoints = game.GetUnitPossibleMovePoints(SelTool.selectedTilePosition);
                 if (movePoints != null && MathUtils.IsListContainsVec2Int(movePoints, pos))
                 {
                     // Unit move
                     game.MoveUnit(SelTool.selectedTilePosition, pos);
-                    AddAndRunAction(new MoveUnit(SelTool.selectedTilePosition, pos,true,render));
+                    bool isCanAttack = game.IsUnitCanAttack(pos);
+                    AddAndRunAction(new MoveUnit(SelTool.selectedTilePosition, pos,!isCanAttack,render));
 
                     SelTool.ClearSelection();
+                    
+                    if(isCanAttack)
+                        SelTool.Select(pos);
+
                     return;
                 }
             }
@@ -79,13 +84,15 @@ public class GameController : MonoBehaviour
         render.RunAction(action);
     }
 
-    private bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints) {
+    private bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints,out List<Vector2Int> attackPoints) {
 
         movePoints = null;
+        attackPoints = null;
 
         if (game.GetUnit(pos) != null)
         {
             movePoints = game.GetUnitPossibleMovePoints(pos);
+            attackPoints = game.GetUnitPossibleAttackPoints(pos);
 
             return true;
         }

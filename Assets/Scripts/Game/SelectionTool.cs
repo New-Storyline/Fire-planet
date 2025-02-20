@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 public class SelectionTool
 {
-    public delegate bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints);
+    public delegate bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints, out List<Vector2Int> attackPoints);
 
     public SelectionType selectionType { get; private set; } = SelectionType.None;
     public Vector2Int selectedTilePosition { get; private set; }
@@ -19,11 +19,11 @@ public class SelectionTool
     public int selectLevel { get; private set; } = 2;
     private Render render;
 
-    private IsUnitExsist isUnitExsist_del;
+    private IsUnitExsist isUnitExsist;
 
-    public SelectionTool(Render render,IsUnitExsist isUnitExsist_del)
+    public SelectionTool(Render render,IsUnitExsist isUnitExsist)
     {
-        this.isUnitExsist_del = isUnitExsist_del;
+        this.isUnitExsist = isUnitExsist;
         this.render = render;
     }
 
@@ -79,24 +79,28 @@ public class SelectionTool
     {
         selectLevel = 0;
         List<Vector2Int> movePoints = new List<Vector2Int>();
-        
-        if (!isUnitExsist_del(selectedTilePosition,out movePoints))
+        List<Vector2Int> attackPoints = new List<Vector2Int>();
+
+        if (!isUnitExsist(selectedTilePosition,out movePoints,out attackPoints))
         {
             IncreaseSelectLevel();
             return;
         }
 
-        SelectUnit(movePoints);
+        SelectUnit(movePoints, attackPoints);
     }
 
     /// <summary>
     /// Selects a tile with unit and renders the selection.
     /// </summary>
     /// <param name="unit"></param>
-    private void SelectUnit(List<Vector2Int> movePoints) {
+    private void SelectUnit(List<Vector2Int> movePoints,List<Vector2Int> attackPoints) {
 
         render.ClearSelection();
+        render.ClearUnitSpecPoints();
+
         render.ShowUnitSelection(selectedTilePosition);
+        render.CreateUnitAttackPoints(attackPoints);
         render.CreateUnitMovePoints(movePoints);
         selectionType = SelectionType.Unit;
     }
