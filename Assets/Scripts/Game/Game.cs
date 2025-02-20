@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Game
@@ -67,6 +68,13 @@ public class Game
         }
     }
 
+    public void NextTurn()
+    {
+        PC.NextTurn();
+    }
+
+    #region Unit_Actions
+
     public void SpawnUnit(Unit unit)
     {
         if (!isValidUnitSpawn(unit))
@@ -74,6 +82,18 @@ public class Game
 
         unit.Owner.AddUnit(unit);
         unitsMap.Set(unit.GetPosition(), unit);
+    }
+
+    private void MoveUnitRaw(Unit unit,Vector2Int newPos)
+    {
+        unitsMap.Move(unit.GetPosition(), newPos);
+        unit.SetPosition(newPos);
+    }
+
+    private void KillUnit(Unit unit) {
+
+        unit.OnKill();
+        unitsMap.Set(unit.GetPosition(), null);
     }
 
     public void MoveUnit(Vector2Int unitPos, Vector2Int newPos)
@@ -84,19 +104,59 @@ public class Game
             throw new Exception($"Cannot move a unit from an empty tile! From: {unitPos.ToString()}. To: {newPos.ToString()}");
 
         if(!unit.isCanMoveInTurn)
-            throw new Exception($"Cannot move a unit in the same turn! From: {unitPos.ToString()}. To: {newPos.ToString()}");
+            throw new Exception($"Cannot move a unit in this turn! From: {unitPos.ToString()}. To: {newPos.ToString()}");
 
         if (!MathUtils.IsListContainsVec2Int(GetUnitPossibleMovePoints(unitPos), newPos))
             throw new Exception($"Cannot move a unit to a non-adjacent tile! From: {unitPos.ToString()}. To: {newPos.ToString()}");
 
-        unitsMap.Move(unitPos, newPos);
+        MoveUnitRaw(unit, newPos);
         unit.OnMove(GetUnitPossibleAttackPoints(newPos).Count != 0);
     }
 
-    public void NextTurn()
+    internal void AttackUnit(Vector2Int attackerPos, Vector2Int defenderPos)
     {
-        PC.NextTurn();
+        Unit attacker = unitsMap.Get(attackerPos);
+
+        if (attacker == null)
+            throw new Exception($"Cannot move a unit from an empty tile! From: {attackerPos.ToString()}. To: {defenderPos.ToString()}");
+
+        if (!attacker.isCanAttackInTurn)
+            throw new Exception($"Cannot attack a unit in this turn! From: {attackerPos.ToString()}. To: {defenderPos.ToString()}");
+
+        if (!MathUtils.IsListContainsVec2Int(GetUnitPossibleAttackPoints(attackerPos), defenderPos))
+            throw new Exception($"Cannot attack unit, the defender's position is not among the possible attack points! From: {attackerPos.ToString()}. To: {defenderPos.ToString()}");
+
+        Unit defender = unitsMap.Get(defenderPos);
+
+        float defenderDamage = defender.GetDefenceDamage();
+        float attackerDamage = attacker.GetAttackDamage();
+
+        attacker.ApplyDamage(defenderDamage, defender);
+        defender.ApplyDamage(attackerDamage, attacker);
+
+        float attackerNewHP = attacker.HP;
+        float defenderNewHP = defender.HP;
+
+        if (attackerNewHP <= 0 && defenderNewHP <= 0)
+            if (attackerNewHP < defenderNewHP)
+                defender.Resurrect();
+            else
+                attacker.Resurrect();
+           
+        if (defenderNewHP <= 0)
+        {
+            KillUnit(defender);
+            MoveUnitRaw(attacker,defenderPos);
+        }
+        else if (attackerNewHP <= 0) {
+
+            KillUnit(attacker);
+        }
+
+        attacker.OnAttack();
     }
+
+    #endregion
 
     #region Getters
 
@@ -192,6 +252,8 @@ public class Game
 
     #endregion
 
+    #region Checkings
+
     private bool isValidUnitSpawn(Unit unit)
     {
         if (!isPosValid(unit.GetPosition()))
@@ -221,6 +283,8 @@ public class Game
     {
         return unitsMap.Get(pos).isCanMoveInTurn;
     }
+
+    #endregion
 
     public enum TerrainType
     {

@@ -35,7 +35,7 @@ public class Map<T>
             throw new System.Exception($"Cannot move to a non-empty tile! From: {from.ToString()}. To: {to.ToString()}. Class name: {map[from.x, from.y].GetType().Name}");
 
         T temp = map[from.x, from.y];
-        map[from.x, from.y] = map[to.x, to.y];
+        map[from.x, from.y] = default;
         map[to.x, to.y] = temp;
     }
 

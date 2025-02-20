@@ -19,6 +19,7 @@ public class Player
     public Unit GetUnit(int num) { return units[num]; }
     public void AddCity(City city) { cities.Add(city); }
     public void AddUnit(Unit unit) { units.Add(unit); }
+    internal void RemoveUnit(Unit unit) { units.Remove(unit); }
 
     public int GetCitiesCount()
     {

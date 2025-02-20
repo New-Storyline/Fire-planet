@@ -39,20 +39,42 @@ public class GameController : MonoBehaviour
     {
         if (pos != SelTool.selectedTilePosition)
         {
-            if(SelTool.selectionType == SelectionTool.SelectionType.Unit && game.IsUnitCanMove(SelTool.selectedTilePosition)) {
+            if (SelTool.selectionType == SelectionTool.SelectionType.Unit && (game.IsUnitCanMove(SelTool.selectedTilePosition) || game.IsUnitCanAttack(SelTool.selectedTilePosition))) {
 
                 List<Vector2Int> movePoints = game.GetUnitPossibleMovePoints(SelTool.selectedTilePosition);
-                if (movePoints != null && MathUtils.IsListContainsVec2Int(movePoints, pos))
-                {
-                    // Unit move
-                    game.MoveUnit(SelTool.selectedTilePosition, pos);
-                    bool isCanAttack = game.IsUnitCanAttack(pos);
-                    AddAndRunAction(new MoveUnit(SelTool.selectedTilePosition, pos,!isCanAttack,render));
+                List<Vector2Int> attackPoints = game.GetUnitPossibleAttackPoints(SelTool.selectedTilePosition);
 
-                    SelTool.ClearSelection();
-                    
-                    if(isCanAttack)
-                        SelTool.Select(pos);
+                if(movePoints != null || attackPoints != null)
+                {
+                    if (movePoints != null && MathUtils.IsListContainsVec2Int(movePoints, pos))
+                    {
+                        // Unit move
+                        game.MoveUnit(SelTool.selectedTilePosition, pos);
+                        bool isCanAttack = game.IsUnitCanAttack(pos);
+                        AddAndRunAction(new MoveUnit(SelTool.selectedTilePosition, pos, !isCanAttack, render));
+
+                        SelTool.ClearSelection();
+
+                        if (isCanAttack)
+                            SelTool.Select(pos);
+                    }
+
+                    if (attackPoints != null && MathUtils.IsListContainsVec2Int(attackPoints, pos))
+                    {
+                        // Unit attack
+
+                        Unit attacker = game.GetUnit(SelTool.selectedTilePosition);
+                        Unit defender = game.GetUnit(pos);
+
+                        game.AttackUnit(SelTool.selectedTilePosition, pos);
+                        bool isCanAttack = game.IsUnitCanAttack(pos);
+                        AddAndRunAction(new AttackUnit(SelTool.selectedTilePosition,pos,attacker, defender, render));
+
+                        SelTool.ClearSelection();
+
+                        if (isCanAttack)
+                            SelTool.Select(pos);
+                    }
 
                     return;
                 }

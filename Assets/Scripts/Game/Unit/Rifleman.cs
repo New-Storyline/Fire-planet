@@ -10,4 +10,19 @@ public class Rifleman : Unit
     public override int GetMoveRange() { return 1; }
     public override int GetAttackRange() { return 1; }
     public override float GetMaxHP(){ return 10;}
+
+    public override float GetDefenceDamage()
+    {
+        return Mathf.Lerp(2,3,HP / GetMaxHP());
+    }
+
+    public override float GetAttackDamage()
+    {
+        return Mathf.Lerp(1, 2, HP / GetMaxHP());
+    }
+
+    public override void ApplyDamage(float damage, Unit damageSource)
+    {
+        HP -= damage;
+    }
 }

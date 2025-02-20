@@ -80,6 +80,7 @@
     <Compile Include="Assets\Scripts\Game\GameController.cs" />
     <Compile Include="Assets\Scripts\Utils\MathUtils.cs" />
     <Compile Include="Assets\Scripts\Game\Players\Player.cs" />
+    <Compile Include="Assets\Scripts\Game\Actions\AttackUnit.cs" />
     <Compile Include="Assets\Scripts\Game\GameObjectBase.cs" />
     <Compile Include="Assets\Scripts\Game\Players\PlayerController.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
