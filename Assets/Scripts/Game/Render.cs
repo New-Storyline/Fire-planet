@@ -1,14 +1,17 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.TerrainUtils;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using static UnityEditor.PlayerSettings;
 
 public class Render : MonoBehaviour
 {
     public delegate float GetSpriteYoffset(Vector2Int pos);
+    public delegate void NextTurn();
 
     [Header("Prefabs")]
     public GameObject groundPrefab;
@@ -20,6 +23,10 @@ public class Render : MonoBehaviour
     public GameObject selectUnitSprite;
     public GameObject selectTileSprite;
     public GameObject unitMovePointSprite;
+    [Header("Canvas")]
+    public TextMeshProUGUI playerIndicatorsText;
+    public GameObject unitSpawnListElem;
+    public Transform unitTrainListContainer;
 
     /// <summary>
     /// Player index -> color material
@@ -27,6 +34,7 @@ public class Render : MonoBehaviour
     public Material[] playerColorMaterials;
 
     public GetSpriteYoffset getSpriteYoffset { get; private set; }
+    private NextTurn nextTurn;
 
     [SerializeField]
     private Vector2 mapScale;
@@ -34,6 +42,7 @@ public class Render : MonoBehaviour
     private readonly Vector3 TILES_OFFSET = new Vector3(0.5f, 0, 0.5f);
 
     private Map map;
+
 
     /// <summary>
     /// List of all unit move and attack points
@@ -47,12 +56,16 @@ public class Render : MonoBehaviour
         BuildUnits(units);
     }
 
-    public void SetDelegates(GetSpriteYoffset getSpriteYoffset) {
+    public void SetDelegates(GetSpriteYoffset getSpriteYoffset, NextTurn nextTurn) {
         this.getSpriteYoffset = getSpriteYoffset;
+        this.nextTurn = nextTurn;
+
+        //for (int i = 0; i < 20; i++)
+        //    Instantiate(unitSpawnListElem, unitTrainListContainer);
+        
     }
 
     #region Build_World
-
     private void BuildTerrain(Map<Game.TerrainType> terrainMap)
     {
         map.terrainMap = new Map<GameObject>(new Vector2Int(terrainMap.GetSize(0), terrainMap.GetSize(1)));
@@ -76,7 +89,6 @@ public class Render : MonoBehaviour
             }
         }
     }
-
     private void BuildBuildings(Map<Building> buildingsMap)
     {
         map.buildingsMap = new Map<GameObject>(new Vector2Int(buildingsMap.GetSize(0), buildingsMap.GetSize(1)));
@@ -94,7 +106,6 @@ public class Render : MonoBehaviour
             }
         }
     }
-
     private void BuildUnits(Map<Unit> units)
     {
         map.unitsMap = new Map<GameObject>(new Vector2Int(units.GetSize(0), units.GetSize(1)));
@@ -111,10 +122,8 @@ public class Render : MonoBehaviour
             }
         }
     }
-
-    #endregion
-
-    public void CreateBuilding(Building building) {
+    public void CreateBuilding(Building building)
+    {
 
         if (building is Village)
         {
@@ -145,35 +154,26 @@ public class Render : MonoBehaviour
         unitObject.SetMaterial(playerColorMaterials[(int)unit.Owner.Team]);
         unitObject.SetHP(unit.HP, unit.GetMaxHP());
     }
-
-    public Vector3 LocalPosToGlobal(Vector2Int pos) {
-
-        return new Vector3(pos.x * mapScale.x + TILES_OFFSET.x, 0, pos.y * mapScale.y + TILES_OFFSET.z);
-    }
-
-    public Vector3 LocalPosToGlobal(int x,int y)
-    {
-        return new Vector3(x * mapScale.x + TILES_OFFSET.x, 0, y * mapScale.y + TILES_OFFSET.z);
-    }
-
-    internal void SetWorldState(Building[,] buildingsMap, Unit[,] unitsMap)
-    {
-        throw new NotImplementedException();
-    }
+    #endregion
 
     public void RunAction(Action action)
     {
         action.Run(map);
     }
-
-    public Vector2 GetMapScale()
+    public void UpdatePlayerIndicatiors(int gold,int goldGrowth,float population,float populationGrowth)
     {
-        return mapScale;
+        population = (float)Math.Round(population, 1);
+        populationGrowth = (float)Math.Round(populationGrowth, 1);
+        playerIndicatorsText.text = $"Gold: {gold} (+{goldGrowth})\nPopulation: {population} (+{populationGrowth})\n";
     }
-
+    public void SetWorldState(Building[,] buildingsMap, Unit[,] unitsMap)
+    {
+        throw new NotImplementedException();
+    }
+    public void OnNextTurnButtonClick() {nextTurn();}
     public void OnNextTurn()
     {
-        for(int x = 0; x < map.unitsMap.GetSize(0); x++)
+        for (int x = 0; x < map.unitsMap.GetSize(0); x++)
         {
             for (int y = 0; y < map.unitsMap.GetSize(1); y++)
             {
@@ -184,6 +184,18 @@ public class Render : MonoBehaviour
                 }
             }
         }
+    }
+    public Vector3 LocalPosToGlobal(Vector2Int pos) {
+
+        return new Vector3(pos.x * mapScale.x + TILES_OFFSET.x, 0, pos.y * mapScale.y + TILES_OFFSET.z);
+    }
+    public Vector3 LocalPosToGlobal(int x,int y)
+    {
+        return new Vector3(x * mapScale.x + TILES_OFFSET.x, 0, y * mapScale.y + TILES_OFFSET.z);
+    }
+    public Vector2 GetMapScale()
+    {
+        return mapScale;
     }
 
     #region Selection_And_Movement

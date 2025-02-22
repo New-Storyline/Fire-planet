@@ -34,6 +34,7 @@ public class PlayerController
     {
         return players[currTurn];
     }
+    public Player GetMainPlayer() { return players[0]; }
 
     /// <summary>
     /// Distributes villages among players one by one
@@ -79,7 +80,7 @@ public class PlayerController
         if (currTurn >= players.Count)
             currTurn = 0;
 
-        GetCurrentPlayer().ActivateUnits();
+        GetCurrentPlayer().NextTurn();
     }
 
     public int PlayersCount { get; }

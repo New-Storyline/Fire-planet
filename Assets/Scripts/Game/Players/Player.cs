@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class Player
 {
+    public int gold { get; private set; } = GameConfig.GAME_START_GOLD;
+    public float population { get; private set; }
+
     private List<City> cities = new List<City>();
     private List<Unit> units = new List<Unit>();
 
@@ -17,6 +20,8 @@ public class Player
 
     public City GetCity(int num) { return cities[num]; }
     public Unit GetUnit(int num) { return units[num]; }
+    public float GetPopulationGrowth() { return 1f; }
+    public int GetGoldGrowth() { return 1; }
     public void AddCity(City city) { cities.Add(city); }
     public void AddUnit(Unit unit) { units.Add(unit); }
     internal void RemoveUnit(Unit unit) { units.Remove(unit); }
@@ -26,13 +31,21 @@ public class Player
         return cities.Count;
     }
 
-    public void ActivateUnits()
+    private void ActivateUnits()
     {
         foreach (var unit in units)
         {
             unit.isCanMoveInTurn = true;
             unit.isCanAttackInTurn = true;
         }
+    }
+
+    public void NextTurn()
+    {
+        gold += GetGoldGrowth();
+        population += GetPopulationGrowth();
+
+        ActivateUnits();
     }
 
     public enum TeamColor

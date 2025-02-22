@@ -15,5 +15,6 @@ public class GameConfig
     public static readonly Dictionary<WorldGen.WorldType,float> MOUNTIANS_SPAWN_RARES = new Dictionary<WorldGen.WorldType, float> {
         {WorldGen.WorldType.defaultWorld, 0.1f}
     };
-    internal const float CAMERA_MAX_Y = 20;
+    public const int GAME_START_GOLD = 5;
+    public const float CAMERA_MAX_Y = 20;
 }

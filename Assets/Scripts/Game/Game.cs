@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Game;
 
 public class Game
 {
@@ -164,12 +165,10 @@ public class Game
     {
         return buildingsMap;
     }
-
     internal Map<TerrainType> GetTerrain()
     {
         return terrainMap;
     }
-
     internal Map<Unit> GetUnits()
     {
         return unitsMap;
@@ -204,7 +203,6 @@ public class Game
        
         return possibleMoves;
     }
-
     public List<Vector2Int> GetUnitPossibleAttackPoints(Vector2Int unitPos)
     {
         Unit unit = unitsMap.Get(unitPos);
@@ -239,15 +237,23 @@ public class Game
 
         return possibleAttackMoves;
     }
-
     internal Unit GetUnit(Vector2Int pos)
     {
         return unitsMap.Get(pos);
     }
-
     internal TerrainType GetTerrainElem(Vector2Int pos)
     {
         return terrainMap.Get(pos);
+    }
+    public Indicator<int> GetMainPlayerGoldInd()
+    {
+        Player player = PC.GetMainPlayer();
+        return new Indicator<int>(player.gold, player.GetGoldGrowth());
+    }
+    public Indicator<float> GetMainPlayerPopulationInd()
+    {
+        Player player = PC.GetMainPlayer();
+        return new Indicator<float>(player.population, player.GetPopulationGrowth());
     }
 
     #endregion
@@ -290,5 +296,19 @@ public class Game
     {
         ground,
         mountain
+    }
+    /// <summary>
+    /// Represe
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct Indicator<T> {
+
+        public T value;
+        public T growth;
+
+        public Indicator(T value,T growth) { 
+            this.value = value;
+            this.growth = growth;
+        }
     }
 }

@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TerrainUtils;
+using static Game;
 
 public class GameController : MonoBehaviour
 {
@@ -26,7 +27,8 @@ public class GameController : MonoBehaviour
         SelTool = new SelectionTool(render, IsUnitExsist);
 
         render.InitWorld(game.GetTerrain(), game.GetBuildings(), game.GetUnits());
-        render.SetDelegates(GetSelectSpriteYoffset);
+        render.SetDelegates(GetSelectSpriteYoffset, NextTurn);
+        UpdatePlayerIndicators();
 
         Vector2 mapScale = render.GetMapScale();
         CC.SetMoveLimits(new Vector3(-5, 0, -5), new Vector3(mapSize.x * mapScale.x, GameConfig.CAMERA_MAX_Y, mapSize.y * mapScale.y));
@@ -92,6 +94,7 @@ public class GameController : MonoBehaviour
 
         render.OnNextTurn();
         game.NextTurn();
+        UpdatePlayerIndicators();
     }
 
     public void Update()
@@ -104,6 +107,12 @@ public class GameController : MonoBehaviour
 
         actions.Add(action);
         render.RunAction(action);
+    }
+
+    private void UpdatePlayerIndicators() {
+        Indicator<int> gold = game.GetMainPlayerGoldInd();
+        Indicator<float> population = game.GetMainPlayerPopulationInd();
+        render.UpdatePlayerIndicatiors(gold.value,gold.growth,population.value,population.growth);
     }
 
     private bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints,out List<Vector2Int> attackPoints) {
