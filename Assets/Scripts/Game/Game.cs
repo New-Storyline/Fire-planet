@@ -22,7 +22,7 @@ public class Game
         buildingsMap = new Map<Building>(mapSize);
         unitsMap = new Map<Unit>(mapSize);
 
-        PC = new PlayerController(playersCount, CaputeSettlement, SpawnUnit);
+        PC = new PlayerController(playersCount, this);
 
         WorldGen.GenerateWorld(terrainMap, buildingsMap, WorldGen.WorldType.defaultWorld);
         SetStartSettlementsForPlayers();
@@ -157,23 +157,27 @@ public class Game
         attacker.OnAttack();
     }
 
+    internal bool TryBuyUnit(Type unitType, City selectedCity)
+    {
+        return selectedCity.AddUnitToTrainQuene(unitType);
+    }
+
     #endregion
 
     #region Getters
-
-    internal Map<Building> GetBuildings()
+    public Map<Building> GetBuildings()
     {
         return buildingsMap;
     }
-    internal Map<TerrainType> GetTerrain()
+    public Map<TerrainType> GetTerrain()
     {
         return terrainMap;
     }
-    internal Map<Unit> GetUnits()
+    public Map<Unit> GetUnits()
     {
         return unitsMap;
     }
-    internal List<Vector2Int> GetUnitPossibleMovePoints(Vector2Int unitPos)
+    public List<Vector2Int> GetUnitPossibleMovePoints(Vector2Int unitPos)
     {
         if (
             !IsUnitCanMove(unitPos) || 
@@ -237,11 +241,15 @@ public class Game
 
         return possibleAttackMoves;
     }
-    internal Unit GetUnit(Vector2Int pos)
+    public Unit GetUnit(Vector2Int pos)
     {
         return unitsMap.Get(pos);
     }
-    internal TerrainType GetTerrainElem(Vector2Int pos)
+    public Building GetBuilding(Vector2Int pos)
+    {
+        return buildingsMap.Get(pos);
+    }
+    public TerrainType GetTerrainElem(Vector2Int pos)
     {
         return terrainMap.Get(pos);
     }
@@ -254,6 +262,10 @@ public class Game
     {
         Player player = PC.GetMainPlayer();
         return new Indicator<float>(player.population, player.GetPopulationGrowth());
+    }
+    public Player GetMainPlayer()
+    {
+        return PC.GetMainPlayer();
     }
 
     #endregion
@@ -288,6 +300,11 @@ public class Game
     public bool IsUnitCanMove(Vector2Int pos)
     {
         return unitsMap.Get(pos).isCanMoveInTurn;
+    }
+
+    internal void RemoveUnitFromSpawnQuene(Type unitType, City selectedCity)
+    {
+        selectedCity.RemoveUnitFromSpawnQuene(unitType);
     }
 
     #endregion

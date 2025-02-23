@@ -31,7 +31,7 @@ public class AttackUnit : Action
         {
             Object.Destroy(defenderObj);
             attackerUnitObj.SetHP(attacker.HP, attacker.GetMaxHP());
-            attackerObj.transform.position = render.LocalPosToGlobal(defenderPos) + new Vector3(0, render.getSpriteYoffset(defenderPos), 0);
+            attackerObj.transform.position = render.LocalPosToGlobal(defenderPos) + new Vector3(0, render.GC.GetSelectSpriteYoffset(defenderPos), 0);
         }
         else {
 

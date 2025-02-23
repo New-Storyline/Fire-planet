@@ -38,4 +38,7 @@ public abstract class Unit : GameObjectBase
     /// Resurrection is needed if during an attack the health of both units was below 0, in this case the one with higher health is resurrected, and the other dies
     /// </summary>
     public void Resurrect() { HP = 0.1f; }
+
+    internal abstract int GetGoldCost();
+    public abstract float GetPopulationCost();
 }

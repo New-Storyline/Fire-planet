@@ -6,14 +6,9 @@ public class PlayerController
 {
     private List<Player> players;
     private int currTurn = 0;
-    
-    public delegate void CaputeSettlement(Player player,Vector2Int pos);
-    public delegate void SpawnUnit(Unit unit);
+    private Game game;
 
-    private CaputeSettlement caputeSettlement_del;
-    private SpawnUnit spawnUnit_del;
-
-    public PlayerController(int playersCount, CaputeSettlement caputeSettlement_del, SpawnUnit spawnUnit_del)
+    public PlayerController(int playersCount, Game game)
     {
         if (playersCount > GameConfig.MAX_PLAYERS)
             throw new System.ArgumentException($"playersCount can't be greater than {GameConfig.MAX_PLAYERS}");
@@ -26,8 +21,7 @@ public class PlayerController
             players.Add(new Player(((Player.TeamColor)i)));
         }
 
-        this.caputeSettlement_del = caputeSettlement_del;
-        this.spawnUnit_del = spawnUnit_del;
+        this.game = game;
     }
 
     public Player GetCurrentPlayer()
@@ -55,7 +49,7 @@ public class PlayerController
 
         for (int i = 0; i < players.Count;i++)
         {
-            caputeSettlement_del?.Invoke(players[i], villages[i].GetPosition());
+            game.CaputeSettlement(players[i], villages[i].GetPosition());
         }
     }
 
@@ -68,7 +62,7 @@ public class PlayerController
         {
             Vector2Int pos = player.GetCity(0).GetPosition();
 
-            spawnUnit_del?.Invoke(new Rifleman(pos, player));
+            game.SpawnUnit(new Rifleman(pos, player));
         }
 
     }

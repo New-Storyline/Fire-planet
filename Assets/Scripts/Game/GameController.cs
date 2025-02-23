@@ -24,10 +24,9 @@ public class GameController : MonoBehaviour
     {
         game = new Game(mapSize,3,1);
         render = GetComponent<Render>();
-        SelTool = new SelectionTool(render, IsUnitExsist);
+        SelTool = new SelectionTool(render, this);
 
-        render.InitWorld(game.GetTerrain(), game.GetBuildings(), game.GetUnits());
-        render.SetDelegates(GetSelectSpriteYoffset, NextTurn);
+        render.InitWorld(this,game.GetTerrain(), game.GetBuildings(), game.GetUnits());
         UpdatePlayerIndicators();
 
         Vector2 mapScale = render.GetMapScale();
@@ -109,13 +108,13 @@ public class GameController : MonoBehaviour
         render.RunAction(action);
     }
 
-    private void UpdatePlayerIndicators() {
+    public void UpdatePlayerIndicators() {
         Indicator<int> gold = game.GetMainPlayerGoldInd();
         Indicator<float> population = game.GetMainPlayerPopulationInd();
         render.UpdatePlayerIndicatiors(gold.value,gold.growth,population.value,population.growth);
     }
 
-    private bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints,out List<Vector2Int> attackPoints) {
+    public bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints,out List<Vector2Int> attackPoints) {
 
         movePoints = null;
         attackPoints = null;
@@ -130,10 +129,40 @@ public class GameController : MonoBehaviour
         return false;
     }
 
-    private float GetSelectSpriteYoffset(Vector2Int pos)
+    public float GetSelectSpriteYoffset(Vector2Int pos)
     {
         if (game.GetTerrainElem(pos) == Game.TerrainType.mountain)
             return 0.12f;
         return 0;
+    }
+
+    /// <summary>
+    /// Checks if building with the specified type exists in the specified position.
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    /// <exception cref="System.NotImplementedException"></exception>
+    internal bool IsBuildingWithTypeExsist(Vector2Int pos, System.Type type,out Building buildingOut)
+    {
+        Building building = game.GetBuilding(pos);
+
+        if (building != null && building.GetType() == type){
+            buildingOut = building;
+            return true;
+        }
+
+        buildingOut = null;
+        return false;
+    }
+
+    internal bool TryBuyUnit(System.Type unitType, City selectedCity)
+    {
+        return game.TryBuyUnit(unitType, selectedCity);
+    }
+
+    internal void RemoveUnitFromSpawnQuene(System.Type unitType, City selectedCity)
+    {
+        game.RemoveUnitFromSpawnQuene(unitType, selectedCity);
     }
 }

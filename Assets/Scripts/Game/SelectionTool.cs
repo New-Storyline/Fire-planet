@@ -9,8 +9,6 @@ using UnityEngine;
 /// </summary>
 public class SelectionTool
 {
-    public delegate bool IsUnitExsist(Vector2Int pos,out List<Vector2Int> movePoints, out List<Vector2Int> attackPoints);
-
     public SelectionType selectionType { get; private set; } = SelectionType.None;
     public Vector2Int selectedTilePosition { get; private set; }
     /// <summary>
@@ -18,12 +16,10 @@ public class SelectionTool
     /// </summary>
     public int selectLevel { get; private set; } = 2;
     private Render render;
-
-    private IsUnitExsist isUnitExsist;
-
-    public SelectionTool(Render render,IsUnitExsist isUnitExsist)
+    private GameController GC;
+    public SelectionTool(Render render,GameController GC)
     {
-        this.isUnitExsist = isUnitExsist;
+        this.GC = GC;
         this.render = render;
     }
 
@@ -66,6 +62,8 @@ public class SelectionTool
         render.ClearSelection();
         selectionType = SelectionType.None;
         selectedTilePosition = new Vector2Int(-1, -1);
+
+        render.CloseTilePanel();
     }
 
     private void TrySelectTile()
@@ -81,7 +79,7 @@ public class SelectionTool
         List<Vector2Int> movePoints = new List<Vector2Int>();
         List<Vector2Int> attackPoints = new List<Vector2Int>();
 
-        if (!isUnitExsist(selectedTilePosition,out movePoints,out attackPoints))
+        if (!GC.IsUnitExsist(selectedTilePosition,out movePoints,out attackPoints))
         {
             IncreaseSelectLevel();
             return;
@@ -114,6 +112,16 @@ public class SelectionTool
         render.ClearSelection();
         render.ShowTileSelection(selectedTilePosition);
         selectionType = SelectionType.Tile;
+
+        Building building = null;
+
+        if (GC.IsBuildingWithTypeExsist(selectedTilePosition,typeof(City),out building))
+        {
+            render.gameGUI.OpenPanel(GameGUI.Mode.City);
+            render.gameGUI.SetSelectedCity((City)building);
+        }
+        else
+            render.gameGUI.OpenPanel(GameGUI.Mode.Tile);
     }
 
     public enum SelectionType

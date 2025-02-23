@@ -13,7 +13,7 @@ public class MoveUnit : Action
 
     public override void Run(Render.Map map)
     {
-        map.unitsMap.Get(unitPos).transform.position = render.LocalPosToGlobal(unitNewPos) + new Vector3(0, render.getSpriteYoffset(unitNewPos),0);
+        map.unitsMap.Get(unitPos).transform.position = render.LocalPosToGlobal(unitNewPos) + new Vector3(0, render.GC.GetSelectSpriteYoffset(unitNewPos),0);
         map.unitsMap.Move(unitPos, unitNewPos);
 
         if (isDeactivate)

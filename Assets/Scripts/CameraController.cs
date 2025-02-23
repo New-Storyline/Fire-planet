@@ -10,6 +10,9 @@ public class CameraController : MonoBehaviour
 
     public event OnTileClickedHandler TileClicked;
 
+    public bool isCameraMoveEnabled = true;
+    public bool isCanSelectTiles = true;
+
     private Vector3 camMinPos; private Vector3 camMaxPos;
 
     public void Update()
@@ -18,8 +21,11 @@ public class CameraController : MonoBehaviour
         CheckMouseClick();
     }
 
-    private void Moving() { 
-    
+    private void Moving() {
+
+        if (!isCameraMoveEnabled)
+            return;
+
         float axisX = Input.GetAxis("Horizontal");
         float axisZ = Input.GetAxis("Vertical");
         float axisY = Input.GetAxis("Mouse ScrollWheel");
@@ -34,6 +40,9 @@ public class CameraController : MonoBehaviour
 
     private void CheckMouseClick()
     {
+        if (!isCanSelectTiles)
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

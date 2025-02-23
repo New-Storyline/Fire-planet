@@ -73,10 +73,12 @@
     <Compile Include="Assets\Scripts\Game\Render.cs" />
     <Compile Include="Assets\Scripts\Game\Actions\Action.cs" />
     <Compile Include="Assets\Scripts\Game\Building\CityObject.cs" />
+    <Compile Include="Assets\Scripts\Game\UnitConfig.cs" />
     <Compile Include="Assets\Scripts\Game\Unit\Rifleman.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Game\Building\Building.cs" />
     <Compile Include="Assets\Scripts\Game\Unit\UnitObject.cs" />
+    <Compile Include="Assets\Scripts\Game\UI\GameGUI.cs" />
     <Compile Include="Assets\Scripts\Game\GameController.cs" />
     <Compile Include="Assets\Scripts\Utils\MathUtils.cs" />
     <Compile Include="Assets\Scripts\Game\Players\Player.cs" />

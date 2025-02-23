@@ -10,9 +10,6 @@ using static UnityEditor.PlayerSettings;
 
 public class Render : MonoBehaviour
 {
-    public delegate float GetSpriteYoffset(Vector2Int pos);
-    public delegate void NextTurn();
-
     [Header("Prefabs")]
     public GameObject groundPrefab;
     public GameObject mountainPrefab;
@@ -33,36 +30,28 @@ public class Render : MonoBehaviour
     /// </summary>
     public Material[] playerColorMaterials;
 
-    public GetSpriteYoffset getSpriteYoffset { get; private set; }
-    private NextTurn nextTurn;
-
     [SerializeField]
     private Vector2 mapScale;
 
     private readonly Vector3 TILES_OFFSET = new Vector3(0.5f, 0, 0.5f);
 
     private Map map;
-
+    public GameGUI gameGUI;
+    public GameController GC { get; private set; }
 
     /// <summary>
     /// List of all unit move and attack points
     /// </summary>
     private List<GameObject> unitSpecPoints = new List<GameObject>();
 
-    public void InitWorld(Map<Game.TerrainType> terrainMap, Map<Building>  buildings, Map<Unit> units)
+    public void InitWorld(GameController GC, Map<Game.TerrainType> terrainMap, Map<Building>  buildings, Map<Unit> units)
     {
+        this.GC = GC;
+        gameGUI = GetComponent<GameGUI>();
+        gameGUI.Init(this,GC);
         BuildTerrain(terrainMap);
         BuildBuildings(buildings);
         BuildUnits(units);
-    }
-
-    public void SetDelegates(GetSpriteYoffset getSpriteYoffset, NextTurn nextTurn) {
-        this.getSpriteYoffset = getSpriteYoffset;
-        this.nextTurn = nextTurn;
-
-        //for (int i = 0; i < 20; i++)
-        //    Instantiate(unitSpawnListElem, unitTrainListContainer);
-        
     }
 
     #region Build_World
@@ -170,7 +159,7 @@ public class Render : MonoBehaviour
     {
         throw new NotImplementedException();
     }
-    public void OnNextTurnButtonClick() {nextTurn();}
+    public void OnNextTurnButtonClick() { GC.NextTurn();}
     public void OnNextTurn()
     {
         for (int x = 0; x < map.unitsMap.GetSize(0); x++)
@@ -218,7 +207,7 @@ public class Render : MonoBehaviour
     public void ShowUnitSelection(Vector2Int pos)
     {
         selectUnitSprite.SetActive(true);
-        selectUnitSprite.transform.position = new Vector3(pos.x * mapScale.x + TILES_OFFSET.x, getSpriteYoffset(pos) + 0.505f, pos.y * mapScale.y + TILES_OFFSET.z);
+        selectUnitSprite.transform.position = new Vector3(pos.x * mapScale.x + TILES_OFFSET.x, GC.GetSelectSpriteYoffset(pos) + 0.505f, pos.y * mapScale.y + TILES_OFFSET.z);
     }
 
     public void ShowTileSelection(Vector2Int pos)
@@ -226,7 +215,7 @@ public class Render : MonoBehaviour
         selectTileSprite.SetActive(true);
         selectTileSprite.transform.position = new Vector3(
             pos.x * mapScale.x + TILES_OFFSET.x,
-            getSpriteYoffset(pos) + 0.505f, 
+            GC.GetSelectSpriteYoffset(pos) + 0.505f, 
             pos.y * mapScale.y + TILES_OFFSET.z
         );
     }
@@ -243,7 +232,7 @@ public class Render : MonoBehaviour
                 unitMovePointSprite, 
                 new Vector3(
                     movePoint.x * mapScale.x + TILES_OFFSET.x,
-                    getSpriteYoffset(movePoint) + 0.505f, 
+                    GC.GetSelectSpriteYoffset(movePoint) + 0.505f, 
                     movePoint.y * mapScale.y + TILES_OFFSET.z), 
                 Quaternion.identity);
             unitSpecPoints.Add(movePointObj);
@@ -261,12 +250,17 @@ public class Render : MonoBehaviour
                 selectUnitSprite,
                 new Vector3(
                     attackPoint.x * mapScale.x + TILES_OFFSET.x,
-                    getSpriteYoffset(attackPoint) + 0.505f,
+                    GC.GetSelectSpriteYoffset(attackPoint) + 0.505f,
                     attackPoint.y * mapScale.y + TILES_OFFSET.z),
                 Quaternion.identity);
             attackPointObj.GetComponentInChildren<SpriteRenderer>().color = Color.red;
             unitSpecPoints.Add(attackPointObj);
         }
+    }
+
+    internal void CloseTilePanel()
+    {
+        gameGUI.ClosePanel();
     }
 
     #endregion

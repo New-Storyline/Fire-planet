@@ -24,6 +24,14 @@ public class Player
     public int GetGoldGrowth() { return 1; }
     public void AddCity(City city) { cities.Add(city); }
     public void AddUnit(Unit unit) { units.Add(unit); }
+    public void AddGold(int gold)
+    {
+        this.gold += gold;
+    }
+    public void AddPopulation(float population)
+    {
+        this.population += population;
+    }
     internal void RemoveUnit(Unit unit) { units.Remove(unit); }
 
     public int GetCitiesCount()

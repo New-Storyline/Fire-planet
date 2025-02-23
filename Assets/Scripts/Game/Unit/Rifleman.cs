@@ -21,6 +21,16 @@ public class Rifleman : Unit
         return Mathf.Lerp(1, 2, HP / GetMaxHP());
     }
 
+    internal override int GetGoldCost()
+    {
+        return 5;
+    }
+
+    public override float GetPopulationCost()
+    {
+        return 10;
+    }
+
     public override void ApplyDamage(float damage, Unit damageSource)
     {
         HP -= damage;
