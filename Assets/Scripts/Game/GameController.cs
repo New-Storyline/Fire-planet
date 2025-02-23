@@ -1,8 +1,9 @@
+using GameCore;
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TerrainUtils;
-using static Game;
+using static GameCore.Game;
 
 public class GameController : MonoBehaviour
 {
@@ -32,7 +33,6 @@ public class GameController : MonoBehaviour
         Vector2 mapScale = render.GetMapScale();
         CC.SetMoveLimits(new Vector3(-5, 0, -5), new Vector3(mapSize.x * mapScale.x, GameConfig.CAMERA_MAX_Y, mapSize.y * mapScale.y));
         CC.TileClicked += OnTileClicked;
-
         //render.SetWorldState(game.GetBuildings(), game.GetUnits());
     }
 

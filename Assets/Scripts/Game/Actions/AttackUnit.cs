@@ -1,3 +1,4 @@
+using GameCore;
 using UnityEngine;
 
 public class AttackUnit : Action
