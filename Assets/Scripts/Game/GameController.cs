@@ -1,39 +1,79 @@
 using GameCore;
+using Net;
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TerrainUtils;
 using static GameCore.Game;
+using static GameServerWrapper;
+using static Net.NetworkSourceServer;
 
 public class GameController : MonoBehaviour
 {
-    /*
-      * Баги/недоработки: 
-      * - При движении юнита на гору, он остается на том же уровне, что и на земле 
-    */
+    public static GameServerWrapper connection;
 
     public CameraController CC;
 
     public Vector2Int mapSize;
 
     private Render render;
-    private Game game;
     private SelectionTool SelTool;
 
     private List<Action> actions = new List<Action>();
+    private Game game;
+    
+    private bool tmp = false;
     public void Start()
     {
-        game = new Game(mapSize,3,1);
         render = GetComponent<Render>();
         SelTool = new SelectionTool(render, this);
 
-        render.InitWorld(this,game.GetTerrain(), game.GetBuildings(), game.GetUnits());
-        UpdatePlayerIndicators();
+        if (connection.IsServer()) {
+
+            GameServer server = (GameServer)connection;
+            server.CreateGame(mapSize, 2, 1);
+        }
+        else
+        {
+            Debug.Log("Start Call");
+            StartCoroutine(connection.VoidCall<object[]>(GameMethod.GetWorldMap, (map) =>
+            {
+                Map<TerrainType> terrain = (Map<TerrainType>)map[0];
+                Debug.Log(terrain.GetSize());
+                Map<Building> buildings = (Map<Building>)map[1];
+                Debug.Log(buildings.GetSize());
+
+                //connection.CallVoidGetter<Map<Building>>(GameMethod.GetBuildings, (buildings) =>
+                //{
+                //    connection.CallVoidGetter<Map<Unit>>(GameMethod.GetUnits, (units) =>
+                //    {
+                //        //render.InitWorld(this, terrain, buildings, units);
+                //        //UpdatePlayerIndicators();
+                //    });
+                //});
+            },
+            null
+            ));
+        }
+        
 
         Vector2 mapScale = render.GetMapScale();
         CC.SetMoveLimits(new Vector3(-5, 0, -5), new Vector3(mapSize.x * mapScale.x, GameConfig.CAMERA_MAX_Y, mapSize.y * mapScale.y));
         CC.TileClicked += OnTileClicked;
-        //render.SetWorldState(game.GetBuildings(), game.GetUnits());
+    }
+
+    public void Update()
+    {
+        connection.Update();
+        //if (Input.GetKeyDown(KeyCode.KeypadEnter) && !tmp)
+        //{
+        //    tmp = true;
+        //    StartCoroutine(GC.CallVoidGetter<Map<TerrainType>>(GameServerWrapper.GameMethod.GetTerrain, (terrain) =>
+        //    {
+        //        Debug.Log(terrain.GetSize());
+        //    }));
+        //}
     }
 
     public void OnTileClicked(Vector2Int pos)
@@ -94,12 +134,6 @@ public class GameController : MonoBehaviour
         render.OnNextTurn();
         game.NextTurn();
         UpdatePlayerIndicators();
-    }
-
-    public void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.KeypadEnter))
-            NextTurn();
     }
 
     private void AddAndRunAction(Action action) {

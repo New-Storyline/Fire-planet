@@ -24,6 +24,8 @@ namespace GameCore
         public Unit GetUnit(int num) { return units[num]; }
         public float GetPopulationGrowth() { return 1f; }
         public int GetGoldGrowth() { return 1; }
+        public void LoadGold(int gold) { this.gold = gold; }
+        public void LoadPopulation(float population) { this.population = population; }
         internal void AddCity(City city) { cities.Add(city); }
         internal void AddUnit(Unit unit) { units.Add(unit); }
         internal void AddGold(int gold)

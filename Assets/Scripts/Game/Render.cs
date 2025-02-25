@@ -1,13 +1,8 @@
 using GameCore;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.TerrainUtils;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
 
 public class Render : MonoBehaviour
 {

@@ -43,5 +43,7 @@ namespace GameCore {
         public abstract float GetAttackDamage();
         public abstract int GetGoldCost();
         public abstract float GetPopulationCost();
+
+        public static Type[] unitTypes = new Type[] { typeof(Rifleman)};
     }
 }

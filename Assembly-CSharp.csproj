@@ -62,16 +62,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Game\SelectionTool.cs" />
-    <Compile Include="Assets\Scripts\Game\GameConfig.cs" />
+    <Compile Include="Assets\Scripts\Game\GameServer\GameClient.cs" />
     <Compile Include="Assets\Scripts\Game\CityObject.cs" />
+    <Compile Include="Assets\Scripts\Game\GameServer\GameServerWrapper.cs" />
+    <Compile Include="Assets\Scripts\Game\GameServer\Command.cs" />
     <Compile Include="Assets\Scripts\Game\CameraController.cs" />
     <Compile Include="Assets\Scripts\Game\Actions\MoveUnit.cs" />
     <Compile Include="Assets\Scripts\Game\Render.cs" />
     <Compile Include="Assets\Scripts\Game\Actions\Action.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Scripts\Game\GameServer\GameServer.cs" />
     <Compile Include="Assets\Scripts\Game\UI\GameGUI.cs" />
     <Compile Include="Assets\Scripts\Game\GameController.cs" />
     <Compile Include="Assets\Scripts\Game\Actions\AttackUnit.cs" />
+    <Compile Include="Assets\Scripts\Game\ConnectionController.cs" />
     <Compile Include="Assets\Scripts\Game\UnitObject.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1124,12 +1128,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.PlasticSCM.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.Multiplayer.Center.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Multiplayer.Center.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.PlasticSCM.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Mathematics.Editor">
@@ -1270,6 +1274,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="NetAssembly.csproj">
+      <Project>{079E3D20-1751-FBA4-CF1E-3289C9E8AFA2}</Project>
+      <Name>NetAssembly</Name>
+    </ProjectReference>
+    <ProjectReference Include="SerializersAssembly.csproj">
+      <Project>{712AD413-C375-90E5-0607-197F997A4185}</Project>
+      <Name>SerializersAssembly</Name>
+    </ProjectReference>
     <ProjectReference Include="GameAssembly.csproj">
       <Project>{60BEB232-401D-F0A2-0B1B-C55738266035}</Project>
       <Name>GameAssembly</Name>

@@ -13,7 +13,7 @@ namespace GameCore {
         {
         }
 
-        internal void SetOwner(Player player)
+        public void SetOwner(Player player)
         {
             Owner = player;
             player.AddCity(this);
@@ -42,6 +42,10 @@ namespace GameCore {
 
             untisSpawnQuene.Add(unitType);
             return true;
+        }
+
+        public void LoadUntisSpawnQuene(List<Type> untisSpawnQuene) { 
+            this.untisSpawnQuene = untisSpawnQuene;
         }
     }
 }

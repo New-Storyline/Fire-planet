@@ -1,0 +1,17 @@
+{
+    "name": "SerializersAssembly",
+    "rootNamespace": "Serialization",
+    "references": [
+        "GUID:97c97b1ba04a2744db765b4df7a10291",
+        "GUID:d8bea1146cd9753488df566c19ea1632"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
